@@ -295,67 +295,67 @@ The Pose Estimator needs to be launched with a launch file, since the location o
 An example launch file is presented below.
 
 
-<launch> 
+    <launch> 
 
-	<!-- Name of the YAML file containing the marker positions -->
-	<arg name="YAML_file_name" default="nameOfTheMarkerPositionFile"/>
+	   <!-- Name of the YAML file containing the marker positions -->
+	   <arg name="YAML_file_name" default="nameOfTheMarkerPositionFile"/>
 
-	<!-- File containing the the marker positions in the trackable's frame of reference -->
-	<arg name="marker_positions_file" default="$(find monocular_pose_estimator)/marker_positions/$(arg YAML_file_name).yaml"/> 
+	   <!-- File containing the the marker positions in the trackable's frame of reference -->
+	   <arg name="marker_positions_file" default="$(find monocular_pose_estimator)/marker_positions/$(arg YAML_file_name).yaml"/> 
 
-	<group ns="monocular_pose_estimator" >
-		<node name="monocular_pose_estimator" pkg="monocular_pose_estimator" type="monocular_pose_estimator" output="screen" respawn="false">  
-			<rosparam command="load" file="$(arg marker_positions_file)"/>
-			<param name= "threshold_value" value = "240" />
-			<param name= "gaussian_sigma" value = "0.6" /> 
-			<param name= "min_blob_area" value = "20" />
-			<param name= "max_blob_area" value = "160" />
-			<param name= "max_width_height_distortion" value = "0.7" />
-			<param name= "max_circular_distortion" value = "0.7" />
-			<param name= "back_projection_pixel_tolerance" value = "5" /> 
-			<param name= "nearest_neighbour_pixel_tolerance" value = "7" /> 
-			<param name= "certainty_threshold" value = "1" />
-			<param name= "valid_correspondence_threshold" value = "0.5" /> 
-			<param name= "number_of_occlusions" value = "0" />
-			<param name= "number_of_false_detections" value = "0" />
+	   <group ns="monocular_pose_estimator" >
+	       	<node name="monocular_pose_estimator" pkg="monocular_pose_estimator" type="monocular_pose_estimator" output="screen" respawn="false">  
+			 <rosparam command="load" file="$(arg marker_positions_file)"/>
+			 <param name= "threshold_value" value = "240" />
+			 <param name= "gaussian_sigma" value = "0.6" /> 
+			 <param name= "min_blob_area" value = "20" />
+			 <param name= "max_blob_area" value = "160" />
+			 <param name= "max_width_height_distortion" value = "0.7" />
+			 <param name= "max_circular_distortion" value = "0.7" />
+			 <param name= "back_projection_pixel_tolerance" value = "5" /> 
+			 <param name= "nearest_neighbour_pixel_tolerance" value = "7" /> 
+			 <param name= "certainty_threshold" value = "1" />
+			 <param name= "valid_correspondence_threshold" value = "0.5" /> 
+			 <param name= "number_of_occlusions" value = "0" />
+			 <param name= "number_of_false_detections" value = "0" />
 			
-			<!-- UAV SPECIFICATIONS -->													
-			<param name= "active_markers" value = "True" />							
-			<param name= "numUAV" value = "1" />										
-			<param name= "numberOfMarkersUAV1" value = "5" />
-			<param name= "numberOfMarkersUAV2" value = "0" />
-			<param name= "numberOfMarkersUAV3" value = "0" />
-			<param name= "numberOfMarkersUAV4" value = "0" />
-			
-			
-			<!-- PARTICLE FILTER PARAMETER -->
-			<param name= "bUseParticleFilter" value = "true" />
-			<param name= "N_Particle" value = "100" />
-			<param name= "maxAngularNoise" value = "0.015" /> 		
-			<param name= "minAngularNoise" value = "-0.015" />		
-			<param name= "maxTransitionNoise" value = "0.035" />		
-			<param name= "minTransitionNoise" value = "-0.035" />	
-			<param name= "back_projection_pixel_tolerance_PF" value = "4" /> 
+			 <!-- UAV SPECIFICATIONS -->													
+			 <param name= "active_markers" value = "True" />							
+			 <param name= "numUAV" value = "1" />										
+			 <param name= "numberOfMarkersUAV1" value = "5" />
+			 <param name= "numberOfMarkersUAV2" value = "0" />
+			 <param name= "numberOfMarkersUAV3" value = "0" />
+			 <param name= "numberOfMarkersUAV4" value = "0" />
 			
 			
-			<!-- MARKER DOWNGRADE -->
-			<param name= "bMarkerNr1" value = "False" />
-			<param name= "bMarkerNr2" value = "False" />
-			<param name= "bMarkerNr3" value = "False" />
-			<param name= "bMarkerNr4" value = "False" />
-			<param name= "bMarkerNr5" value = "False" />
+			 <!-- PARTICLE FILTER PARAMETER -->
+			 <param name= "bUseParticleFilter" value = "true" />
+			 <param name= "N_Particle" value = "100" />
+			 <param name= "maxAngularNoise" value = "0.015" /> 		
+			 <param name= "minAngularNoise" value = "-0.015" />		
+			 <param name= "maxTransitionNoise" value = "0.035" />		
+			 <param name= "minTransitionNoise" value = "-0.035" />	
+			 <param name= "back_projection_pixel_tolerance_PF" value = "4" /> 
 			
-			<!-- MISCELLANEOUS -->
-			<param name= "useOnlineExposeTimeControl" value = "false" />			
-			<param name= "expose_time_base" value = "2000" />		 
-			<param name= "bUseCamPos" value = "false" />			
-		</node> 
+			
+			 <!-- MARKER DOWNGRADE -->
+			 <param name= "bMarkerNr1" value = "False" />
+			 <param name= "bMarkerNr2" value = "False" />
+			 <param name= "bMarkerNr3" value = "False" />
+			 <param name= "bMarkerNr4" value = "False" />
+			 <param name= "bMarkerNr5" value = "False" />
+			
+			 <!-- MISCELLANEOUS -->
+			 <param name= "useOnlineExposeTimeControl" value = "false" />			
+			 <param name= "expose_time_base" value = "2000" />		 
+			 <param name= "bUseCamPos" value = "false" />			
+		  </node> 
 	
-	 <node name="view_visualisation_image" pkg="image_view" type="image_view" args="image:=/monocular_pose_estimator/image_with_detections" />
+	   <node name="view_visualisation_image" pkg="image_view" type="image_view" args="image:=/monocular_pose_estimator/image_with_detections" />
 
-	</group>
+	   </group>
 
-</launch>
+    </launch>
 
 In case the image and the camera info are coming from a bagfile, the file has to be added with the following lines
 	<!-- rosbag play -->
