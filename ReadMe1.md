@@ -49,27 +49,6 @@ In order to install the Real-Time UAV Pose Estimator, clone the latest version f
     catkin_make
 
 
-Test Installation on Basic Dataset
-----------------------------------
-
-* In order to test the installation on a data set, download the data set from [here](http://rpg.ifi.uzh.ch/data/monocular-pose-estimator-data.tar.gz), and follow these instructions. Change the adress
-
-1.    Download and Untar a sample ROS bag file
-
-          roscd monocular_pose_estimator
-          mkdir bags
-          cd bags
-          wget http://rpg.ifi.uzh.ch/data/monocular-pose-estimator-data.tar.gz (change the adress)
-          tar -zxvf monocular-pose-estimator-data.tar.gz
-          rm monocular-pose-estimator-data.tar.gz
-
-2.    Launch the demo launch file using
-
-          roslaunch monocular_pose_estimator demo.launch
-
-3.    You should see a visualisation of the system: detected LEDs should be circled in green, the region of interest in the image that is being processed should be bounded by a yellow rectangle, and the orientation of the tracked object will be represented by the red-green-blue trivector located at the origin of the traget object's coordinate frame.
-
-
 Basic Usage
 -----------
 
@@ -390,9 +369,6 @@ The camera used was a [MatrixVision](http://www.matrix-vision.com/) mvBlueFOX mo
 
 
 
-
-
-
 Important hints
 ---------------
 
@@ -433,16 +409,21 @@ In the case when multiple UAVs are tracked the marker position file and the UAV 
       z: 0.245
 
 #### Exposure time
-When new video-bagfiles are recorded or the pose estimator is used for an online application, the exposure time has to be set manually. Consider a too small exposure time may lead to tracking losses in bigger distances, while a too big one can lead to a very noisy environment and to tracking losses in closer distances.
+When new video-bagfiles are recorded or the pose estimator is used for an online application, the exposure time has to be set manually. Consider that a too small exposure time may lead to tracking losses in bigger distances, while a too big one can lead to a very noisy environment and to tracking losses at closer distances.
+
 
 #### Parameter changes
-When using a provided launch file, some parameter change can have a big impact on the accuracy and the needed estimation time:
-	- Number of particles
-	- min/max noise in the motion model
-	- min/max cluster size (detection stage)
+Some parameter change can have a big impact on the accuracy and the needed estimation time:
 
-#### Display images
-Showing the 'image_with_detections' during calculations will lead to a not neglible increase of computational time (bias up to 0.01ms)
+* Number of particles
+
+* min/max noise in the motion model
+
+* min/max cluster size (detection stage)
+
+Especially when changing the applied noise in the motion model, be aware that using high values will reduce the influence of the linear prediction and let the noise dominate the pose prediction.
+
+
 
 
 Run Experiments
