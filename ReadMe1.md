@@ -1,10 +1,79 @@
-Readme:
+##
+
+Real-Time UAV Pose Estimator
+======================
+
+Disclaimer and License
+---------------
+
+The Real-Time UAV Pose Estimator has been tested under the following setups:
+
+* ROS-Indigo and Ubuntu 14.04
+
+This is research code, expect that it changes often and any fitness for a particular purpose is disclaimed.
+
+
+Package Summary
+---------------
+
+The Real-Time UAV Pose Estimator uses causual LEDs mounted on a target object and a camera monocular to estimate the pose of an object.
+
+The positions of the LEDs on the target object are provided by the user in a YAML configuration file. The LEDs are detected in the image, and a pose estimate for the target object is subsequently calculated.
+
+
+Installation
+------------
+
+### Installation of the package
+
+#### Dependencies
+
+The Real-Time UAV Pose Estimator is built on the Robotic Operating System (ROS). In order to install the package, ROS has to be installed.
+
+- In order to install the Robot Operating System (ROS), please follow the instructions provided in the [link](http://wiki.ros.org).
+- Make sure you have properly set up a ROS catkin workspace as described [here](http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment).
+
+Additionally, the Real-Time UAV Pose Estimator makes use of [OpenCV](http://opencv.org) for image processing and the [Eigen](http://eigen.tuxfamily.org) linear algebra library. These should come preinstalled with ROS, however, if the dependency is missing they can be installed from their respective websites:
+
+- To install OpenCV, follow the installation instructions provided on the OpenCV [website](http://opencv.org).
+
+- To install the Eigen linear algebra library, follow the installation instructions provided on the Eigen [website](http://eigen.tuxfamily.org).
+
+#### Main Installation
+
+In order to install the Real-Time UAV Pose Estimator, clone the latest version from our *GitHub* repository into your catkin workspace and compile the package using ROS.
+
+    cd catkin_workspace/src
+ *   git clone https://github.com/uzh-rpg/rpg_monocular_pose_estimator.git Change adress
+    cd ../
+    catkin_make
+
+
+Test Installation on Basic Dataset
+----------------------------------
+
+* In order to test the installation on a data set, download the data set from [here](http://rpg.ifi.uzh.ch/data/monocular-pose-estimator-data.tar.gz), and follow these instructions. Change the adress
+
+1.    Download and Untar a sample ROS bag file
+
+          roscd monocular_pose_estimator
+          mkdir bags
+          cd bags
+          wget http://rpg.ifi.uzh.ch/data/monocular-pose-estimator-data.tar.gz (change the adress)
+          tar -zxvf monocular-pose-estimator-data.tar.gz
+          rm monocular-pose-estimator-data.tar.gz
+
+2.    Launch the demo launch file using
+
+          roslaunch monocular_pose_estimator demo.launch
+
+3.    You should see a visualisation of the system: detected LEDs should be circled in green, the region of interest in the image that is being processed should be bounded by a yellow rectangle, and the orientation of the tracked object will be represented by the red-green-blue trivector located at the origin of the traget object's coordinate frame.
 
 
 Basic Usage
 -----------
 
-The Pose Estimator makes use of a number of parameters to estimate the pose of the tracked object. These include the location of the LEDs on the object, the intrinsic parameters of the camera, and various runtime parameters, such as thresholding values.
+The Real-Time UAV Pose Estimator makes use of a number of parameters to estimate the pose of the tracked object. These include the location of the LEDs on the object, the intrinsic parameters of the camera, and various runtime parameters, such as thresholding values.
 
 #### Setting up the Marker Positions Parameter File
 
@@ -37,19 +106,50 @@ If you would like to use your own marker positions file, place it in the `monocu
 
 #### Running the pose estimator with a USB camera 
 
-To run the method with a USB camera it has to be calibrated. (ADD HOW TO CALIBRATE THEE CAMERA)
+Ensure that you have a working USB camera.
 
-The information given (published) by the camera are the following two:
+The camera needs to be calibrated. Follow the instructions at http://www.ros.org/wiki/camera_calibration/Tutorials/MonocularCalibration.
 
-* mv_25001329/image_raw ([sensor_msgs/Image](http://docs.ros.org/api/sensor_msgs/html/msg/Image.html))
+The pose estimator listens to the mv_25001329/image_raw topic and the mv_25001329/camera_info topic of the camera at launch. An example of such a camera_info topic is:
+    
+    header: 
+      seq: 4525
+      stamp: 
+        secs: 1452243541
+        nsecs: 483605772
+      frame_id: camera_mv
+    height: 480
+    width: 752
+    distortion_model: plumb_bob
+    D: [-0.2987656130625547, 0.090512327786479, 0.0006983134447049677, 0.0004069824038616868, 0]
+    K: [475.4220992391843, 0, 378.1094270899403, 0, 475.6638941565314, 236.6226272309063, 0, 0, 1]
+    R: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+    P: [376.2829284667969, 0, 379.3125311122712, 0, 0, 435.74609375, 235.8427641757298, 0, 0, 0, 1, 0]
+    ---
 
-  The image from the camera. The LEDs will be detected in this image. 
+The camera should be adjusted so that the gain and shutter/exposure time of the camera are fixed. (Use 'rqt_reconfigure'  to adjust the camera parameters while the camera is running). Ideally, the LEDs should appear very bright in the image so that they can easily be segmented from the surrounding scene by simple thresholding. See 'Parameter Settings' below on how to change the thresholding value.
+
+#### Inputs, Outputs
+
+##### Configuration Files
+
+The Real-Time UAV Pose Estimator requires the LED positions on the target object. These are entered in a YAML file and are loaded at runtime. See 'Setting up the Marker Positions Parameter File' above for more details.
+
+##### Subscribed Topics
+
+The RPG Monocular Pose Estimator subscribes to the following topics:
+
+* mv_25001329/camera_info ([sensor_msgs/Image](http://docs.ros.org/api/sensor_msgs/html/msg/Image.html))
+
+  The image form the camera. The LEDs will be detected in this image. 
 
 * mv_25001329/camera_info ([sensor_msgs/CameraInfo](http://docs.ros.org/api/sensor_msgs/html/msg/CameraInfo.html))
 
   The camera calibration parameters.
 
-The pose estimator publishes the following topics:
+##### Published Topics
+
+The RPG Monocular Pose Estimator publishes the following topics:
 
 * estimated_pose_UAV1 ([geometry_msgs/PoseWithCovarianceStamped](http://docs.ros.org/api/geometry_msgs/html/msg/PoseWithCovarianceStamped.html))
 
@@ -141,51 +241,51 @@ The following parameters can be set dynamically during runtime. (Use 'rqt_reconf
 
 * active_markers (bool, default: true)
 
-	This parameter defines if active or passive markers are used
+  This parameter defines if active or passive markers are used
 
 * bUseParticleFilter (bool, default: true)
 
-	This parameter defines if the particle filter approach is used, or if the IPE from Faessler et al. (ICRA 2014) is used
+  This parameter defines if the particle filter approach is used, or if the IPE from Faessler et al. (ICRA 2014) is used
 
 * N_Particle (int, default: 1, min: 1, max: 20000)
 
-	This is the number of particles which is used in the particle filter. (Should not be done online!!!!)
+  This is the number of particles which is used in the particle filter. (Should not be done online!!!!)
 
 * maxAngularNoise (int, default: 0, min: -1.5, max: 1.5)
 
-	This is the maximum angular noise which is used in the motion model
+  This is the maximum angular noise which is used in the motion model
 
 * minAngularNoise (int, default: 0, min: -1.5, max: 1.5)
 
-	This is the minimal angular noise which is used in the motion model
+  This is the minimal angular noise which is used in the motion model
 
 * maxTransitionNoise (int, default: 0, min: -0.5, max: 0.5)
 
-	This is the maximum transition noise which is used in the motion model
+  This is the maximum transition noise which is used in the motion model
 
 * minTransitionNoise (int, default: 0, min: -0.5, max: 0.5)
 
-	This is the minimal transition noise which is used in the motion model
+  This is the minimal transition noise which is used in the motion model
 
 * back_projection_pixel_tolerance_PF (int, default: 10, min: 0, max: 100)
 
-	This is the tolerance (in pixels) between a back projected LED and an image detection during the weighting phase in the particle filter. If a back projected LED is within this threshold, the weight of the pose will be increased
+  This is the tolerance (in pixels) between a back projected LED and an image detection during the weighting phase in the particle filter. If a back projected LED is within this threshold, the weight of the pose will be increased
 
 * bMarkerNrX (bool, default: false)
 
-	This parameter tells if the marker number X is downgraded or not. (Can only be used if one UAV is tracked)
+  This parameter tells if the marker number X is downgraded or not. (Can only be used if one UAV is tracked)
 
 * useOnlineExposeTimeControl (bool, default: false)
 
-	If this parameter is ture, the exposure time will be adapted online. A change takes about 1ms, and is therefore not recommended.
+  If this parameter is ture, the exposure time will be adapted online. A change takes about 1ms, and is therefore not recommended.
 
 * expose_time_base (int, default: 2000, min: 10, max: 8000
 
-	This is the initial expose time which is used in case the expose time is calculated online
+  This is the initial expose time which is used in case the expose time is calculated online
 
 * bUseCamPos (bool, default: false)
 
-	This boolean tells if the movement of the camera is considered in the pose prediction or not. (should only be used if reliable information is available)
+  This boolean tells if the movement of the camera is considered in the pose prediction or not. (should only be used if reliable information is available)
 
 
 
@@ -267,43 +367,70 @@ In case the some topics have to be recored the following lines can be added
 			
 
 
+Hardware
+--------
+
+The Real-Time UAV Pose Estimator makes use of causual LEDs mounted on the target object and a monocular camera . The details of the LEDs and camera that were used in our evaluation of the package are outlined below. Our system will be able to work with any kind of LEDs and camera, provided that the LEDs appear bright in the image and can consequently be segmented from the image using simple thresholding operations. Also the emission pattern of the LEDs should be as wide as possible, so that they still appear bright in the image even when viewed from shallow viewing angles.
+
+
+### LEDs
+
+The LEDs that were used were NeoPixel Mini PCB LEDs. They are tiny but still very bright and have a wide emission pattern.
+
+
+#### LED Configuration
+
+The placement of the LED on the UAV can be more or less arbitary. Configurations which should be avoided contain symmetries or more than two LEDs on the same line. To improve the accuracy it is benefitial if the LEDs span a big volume and are not collinear. In the initialsation phase the Real-Time UAV Pose Estimator requires at least four LEDs to be visible. Afterwards the UAV can be tracked if at least one LED is visible, but the less LEDs are visible, the less accurate is the estimated pose. 
+
+
+### Camera
+
+The camera used was a [MatrixVision](http://www.matrix-vision.com/) mvBlueFOX monochrome camera. Its resolution is 752x480 pixels.
+
+
+
+
+
+
+
 Important hints
 ---------------
 
-#### Marker Positions
-Every time the LED configuration is changed, the YAML file containing the marker positions has to be changed.
-In case multiple UAVs are tracked, the makers have to be defined as only one UAV with more markers would be used
-e.g.marker_positions:
-  - x: 0.00	# start  of the first UAV
-    y: 0.00
-    z: 0.000
-  - x: 0.123
-    y: 0.00
-    z: 0.00
-  - x: 0.251
-    y: 0.0
-    z: 0.000
-  - x: 0.12644
-    y: 0.200454
-    z: 0.00
-  - x: 0.20644  
-    y: 0.128304
-    z: 0.13
-  - x: 0.00	# start of the second UAV
-    y: 0.00
-    z: 0.000
-  - x: 0.245
-    y: 0.00
-    z: 0.00
-  - x: 0.245
-    y: 0.25
-    z: 0.000
-  - x: 0.495
-    y: 0.25
-    z: 0.00
-  - x: 0.245  
-    y: 0.0
-    z: 0.245
+#### Tracking multiple UAVs
+In the case when multiple UAVs are tracked the marker position file and the UAV specifications in the launchfile have to be changed. The position of the markers have to be defined as one UAV with more LEDs would be used.
+
+    e.g.marker_positions:
+
+    - x: 0.00	# start  of the first UAV
+      y: 0.00
+      z: 0.000
+    - x: 0.123
+      y: 0.00
+      z: 0.00
+    - x: 0.251
+      y: 0.0
+      z: 0.000
+    - x: 0.12644
+      y: 0.200454
+      z: 0.00
+    - x: 0.20644  
+      y: 0.128304
+      z: 0.13
+    - x: 0.00	# start of the second UAV
+      y: 0.00
+      z: 0.000
+    - x: 0.245
+      y: 0.00
+      z: 0.00
+    - x: 0.245
+      y: 0.25
+      z: 0.000
+    - x: 0.495
+      y: 0.25
+      z: 0.00
+    - x: 0.245  
+      y: 0.0
+      z: 0.245
 
 #### Exposure time
 When new video-bagfiles are recorded or the pose estimator is used for an online application, the exposure time has to be set manually. Consider a too small exposure time may lead to tracking losses in bigger distances, while a too big one can lead to a very noisy environment and to tracking losses in closer distances.
@@ -324,10 +451,3 @@ Run Experiments
 To run simple experiments it is enough to run the launchfile provided above.
 If a bag file has to be run, make sure the correct marker position file is used.
 The bag files provided for testing the algorithm, require different marker position files, the corresponding launch file is already prepared for such a run. 
-
-
-
-
-
-
-
